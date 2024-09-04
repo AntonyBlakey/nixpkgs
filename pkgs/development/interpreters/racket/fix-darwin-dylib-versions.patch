@@ -1,0 +1,49 @@
+diff -ur old.racket/share/pkgs/draw-lib/racket/draw/unsafe/glib.rkt new.racket/share/pkgs/draw-lib/racket/draw/unsafe/glib.rkt
+--- old.racket/share/pkgs/draw-lib/racket/draw/unsafe/glib.rkt	2024-07-08 02:29:06
++++ new.racket/share/pkgs/draw-lib/racket/draw/unsafe/glib.rkt	2024-09-04 04:07:18
+@@ -12,7 +12,7 @@
+ (define-runtime-lib glib-lib
+   [(unix) (ffi-lib "libglib-2.0" '("0" ""))]
+   [(macosx)
+-   (ffi-lib "libintl.9.dylib")
++   (ffi-lib "libintl.8.dylib")
+    (ffi-lib "libglib-2.0.0.dylib")]
+   [(windows)
+    (ffi-lib "libiconv-2.dll")
+@@ -35,7 +35,7 @@
+    ;; natipkg, and shared-library search when libgobject is loaded
+    (ffi-lib "libffi" '("6" "7" "8" "") #:fail (lambda () #f))]
+   [(macosx)
+-   (ffi-lib "libffi.6.dylib")]
++   (ffi-lib "libffi.8.dylib")]
+   [(windows)
+    (ffi-lib "libffi-6.dll")])
+ 
+diff -ur old.racket/src/native-libs/install.rkt new.racket/src/native-libs/install.rkt
+--- old.racket/src/native-libs/install.rkt	2024-07-08 06:21:25
++++ new.racket/src/native-libs/install.rkt	2024-09-04 04:05:39
+@@ -28,13 +28,13 @@
+   `(("libmpfr.6" "libmpfr.4")))
+ 
+ (define libs
+-  `("libffi.6"
++  `("libffi.8"
+     "libgio-2.0.0"
+     "libgmodule-2.0.0"
+     "libgthread-2.0.0"
+     "libglib-2.0.0"
+     "libgobject-2.0.0"
+-    "libintl.9"
++    "libintl.8"
+     "libharfbuzz.0"
+     "libfribidi.0"
+     "libpango-1.0.0"
+@@ -99,7 +99,7 @@
+      "libgdk-x11-2.0.0"
+      "libgdk_pixbuf-2.0.0")))
+ (define linux-remove-libs
+-  '("libintl.9"))
++  '("libintl.8"))
+ 
+ (struct pkg-spec (name
+                   suffix ; (increment after "-" when library versions change)

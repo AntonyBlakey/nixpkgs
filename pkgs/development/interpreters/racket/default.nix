@@ -31,6 +31,14 @@
   CoreFoundation,
   gsettings-desktop-schemas,
   wrapGAppsHook3,
+  ################### ASB
+  util-linux,
+  libjpeg_original,
+  pixman,
+  libintl,
+  freetype,
+  fribidi,
+  harfbuzz,
 }:
 
 let
@@ -46,7 +54,6 @@ let
       gtk3
       gsettings-desktop-schemas
       libedit
-      libjpeg
       libpng
       mpfr
       ncurses
@@ -57,10 +64,23 @@ let
       sqlite
     ]
     ++ lib.optionals (!stdenv.isDarwin) [
+      libjpeg
       libGL
       libGLU
     ]
+    ################### ASB
+    ++ lib.optionals stdenv.isDarwin [
+      util-linux # libuuid
+      libjpeg_original
+      pixman
+      libintl
+      freetype
+      libffi
+      fribidi
+      harfbuzz
+    ]
   );
+
 in
 
 stdenv.mkDerivation rec {
@@ -104,21 +124,32 @@ stdenv.mkDerivation rec {
     ++ lib.optionals stdenv.isDarwin [
       libiconv
       CoreFoundation
+      ################### ASB
+      util-linux # libuuid
+      libjpeg_original
+      pixman
+      libintl
+      freetype
+      fribidi
+      harfbuzz
     ];
 
-  patches = [
-    # Hardcode variant detection because we wrap the Racket binary making it
-    # fail to detect its variant at runtime.
-    # See: https://github.com/NixOS/nixpkgs/issues/114993#issuecomment-812951247
-    ./force-cs-variant.patch
+  patches =
+    [
+      # Hardcode variant detection because we wrap the Racket binary making it
+      # fail to detect its variant at runtime.
+      # See: https://github.com/NixOS/nixpkgs/issues/114993#issuecomment-812951247
+      ./force-cs-variant.patch
 
-    # The entry point binary $out/bin/racket is codesigned at least once. The
-    # following error is triggered as a result.
-    # (error 'add-ad-hoc-signature "file already has a signature")
-    # We always remove the existing signature then call add-ad-hoc-signature to
-    # circumvent this error.
-    ./force-remove-codesign-then-add.patch
-  ];
+      # The entry point binary $out/bin/racket is codesigned at least once. The
+      # following error is triggered as a result.
+      # (error 'add-ad-hoc-signature "file already has a signature")
+      # We always remove the existing signature then call add-ad-hoc-signature to
+      # circumvent this error.
+      ./force-remove-codesign-then-add.patch
+    ]
+    ################### ASB
+    ++ lib.optionals stdenv.isDarwin [ ./fix-darwin-dylib-versions.patch ];
 
   preConfigure =
     ''
@@ -172,7 +203,9 @@ stdenv.mkDerivation rec {
     ++ lib.optionals disableDocs [ "--disable-docs" ]
     ++ lib.optionals stdenv.isDarwin [
       "--disable-strip"
-      "--enable-xonx"
+      ################### ASB
+      # "--enable-xonx"
+      "--enable-macprefix"
     ];
 
   configureScript = "../configure";
